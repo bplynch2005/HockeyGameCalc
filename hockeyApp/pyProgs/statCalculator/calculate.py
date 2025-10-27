@@ -2,8 +2,8 @@ from nhlTeams import NHLTeams
 
 def calculate(team1Stats, team2Stats, team1_, team2_):
     #*****Calculating who has the better matchup based on the season stats*****
-    team1 = NHLTeams[team1_]
-    team2 = NHLTeams[team2_]
+    team1 = team1_
+    team2 = team2_
     team1Score = 0
     team2Score = 0
     boolWSTREAK = False

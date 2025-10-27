@@ -5,6 +5,7 @@ import re
 
 from pyProgs.statParser.parse import parse
 from pyProgs.statCalculator.calculate import calculate
+from pyProgs.getGames.todaysGames import todaysGames
 
 @app.route('/')
 def method():
@@ -27,10 +28,22 @@ def getData():
  
     return resp
 
-@app.route('/predictions', methods=['GET', 'POST'])
+@app.route('/todaysGames', methods=['GET', 'POST'])
 def predict():
-    return render_template('homePage.html')
+    schedule = todaysGames()
+    statsList = []
+    for matchup in schedule:
+        teamStats = parse(matchup[0], matchup[1])
+        statsList.append(teamStats)
     
+    winnerList = []
+    for stats in statsList:
+        prediction = calculate(stats[0], stats[1], stats[2], stats[3])
+        finalData = {"teams": {"team1": {"name": stats[2], "stats": stats[0]}, "team2": {"name": stats[3], "stats": stats[1]}}, "prediction":{"betterTeam": prediction[0], "confidence": prediction[1], "decidingFactor": prediction[2]}}
+        winnerList.append(finalData)
+
+    resp = make_response(render_template("todaysGames.html", data=winnerList))
+    return resp
 
 @app.route('/index')
 def index():
