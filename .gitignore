@@ -1,0 +1,83 @@
+# ======================================
+# Python cache and compiled files
+# ======================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ======================================
+# Virtual environments
+# ======================================
+venv/
+.env/
+.venv/
+env/
+ENV/
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+
+# ======================================
+# Build / distribution / packaging
+# ======================================
+build/
+dist/
+develop-eggs/
+.eggs/
+.installed.cfg
+MANIFEST
+
+# ======================================
+# Unit test / coverage reports
+# ======================================
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.cache/
+nosetests.xml
+coverage.xml
+
+# ======================================
+# Jupyter / IPython / notebooks
+# ======================================
+.ipynb_checkpoints
+
+# ======================================
+# Logs and misc runtime files
+# ======================================
+*.log
+*.pot
+*.mo
+*.pid
+*.seed
+*.swo
+*.swp
+
+# ======================================
+# Flask / Django / local settings
+# ======================================
+instance/
+*.db
+*.sqlite3
+config.json
+.env.local
+.env.development
+.env.production
+
+# ======================================
+# IDE / Editor specific
+# ======================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ======================================
+# macOS / Windows / system files
+# ======================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+

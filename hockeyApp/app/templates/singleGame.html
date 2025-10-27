@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matchup Overview</title>
+
+  <style>
+    :root {
+      /* Page + neutrals */
+      --bg-page: #f3f4f8;              /* soft light gray */
+      --bg-card: #ffffff;              /* white cards */
+      --border-card: #d1d5df;          /* light gray border */
+      --text-main: #1a1a1f;
+      --text-dim: #51545f;
+
+      /* Accents */
+      --accent-bg: #eef3ff;            /* soft blue */
+      --accent-border: #96a9ff;
+      --accent-text: #1b255f;
+
+      /* Team colors */
+      --team1-header-bg: #0d3b66;      /* navy */
+      --team1-header-text: #ffffff;
+      --team2-header-bg: #7b1e2b;      /* deep red */
+      --team2-header-text: #ffffff;
+
+      --table-header-bg: #f8f9fb;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      line-height: 1.45;
+      padding: 2rem 3rem;
+      overflow-y: scroll;
+    }
+
+    /* =========================
+       THEMED SCROLLBAR (Webkit)
+       ========================= */
+    body::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: var(--bg-page);
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background-color: #b7bfd8;
+      border-radius: 6px;
+      border: 2px solid var(--bg-page);
+      transition: background 0.3s ease;
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background-color: #96a9ff;
+    }
+
+    /* =========================
+       HEADER / PREDICTION BOX
+       ========================= */
+    header.page-header {
+      max-width: 1200px;
+      margin: 0 auto 1.75rem auto;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem 1.5rem;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+    }
+
+    .matchup-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+    }
+
+    .matchup-left h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent-text);
+    }
+
+    .matchup-left .teams-line {
+      margin-top: 0.25rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .prediction-block {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .info-card {
+      background-color: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      min-width: 200px;
+      flex: 1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--accent-text);
+      margin: 0;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04rem;
+    }
+
+    .info-value {
+      margin: 0.4rem 0 0 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-text);
+      line-height: 1.3;
+    }
+
+    .info-value.big {
+      font-size: 1.2rem;
+    }
+
+    /* =========================
+       MAIN LAYOUT
+       ========================= */
+    main.layout {
+      max-width: 1200px;
+      margin: 0 auto 3rem auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+    }
+
+    /* =========================
+       TEAM CARD
+       ========================= */
+    .team-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+    }
+
+    .team-header {
+      padding: 1rem 1.25rem;
+    }
+
+    .team-header.team1 {
+      background-color: var(--team1-header-bg);
+      color: var(--team1-header-text);
+    }
+
+    .team-header.team2 {
+      background-color: var(--team2-header-bg);
+      color: var(--team2-header-text);
+    }
+
+    .team-header-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+    }
+
+    .team-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: -0.02rem;
+    }
+
+    .team-streak-badge {
+      background-color: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.25rem 0.4rem;
+      line-height: 1.2;
+    }
+
+    .team-meta {
+      font-size: 0.8rem;
+      margin: 0;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .team-body {
+      padding: 1rem 1.25rem 1.25rem;
+    }
+
+    /* =========================
+       STAT TABLE
+       ========================= */
+    table.stat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    table.stat-table thead th {
+      background-color: var(--table-header-bg);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.5rem 0.5rem;
+      border-bottom: 1px solid var(--border-card);
+      color: var(--text-main);
+    }
+
+    table.stat-table tbody td {
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid var(--border-card);
+      vertical-align: top;
+      color: var(--text-main);
+    }
+
+    table.stat-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .stat-label {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .stat-desc {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-weight: 400;
+      margin-top: 0.2rem;
+      line-height: 1.3;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      text-align: right;
+      color: var(--text-main);
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="page-header">
+  <div class="matchup-title">
+    <div class="matchup-left">
+      <h1>Matchup Overview</h1>
+      <div class="teams-line">
+        {{ data.teams.team1.name }} vs {{ data.teams.team2.name }}
+      </div>
+    </div>
+  </div>
+
+  <div class="prediction-block">
+    <div class="info-card">
+      <p class="info-label">Predicted Winner</p>
+      <p class="info-value big">{{ data.prediction.betterTeam }}</p>
+    </div>
+
+    <div class="info-card">
+      <p class="info-label">Confidence</p>
+      <p class="info-value">{{ data.prediction.confidence }}</p>
+    </div>
+
+    <div class="info-card">
+      <p class="info-label">Key Factor</p>
+      <p class="info-value">{{ data.prediction.decidingFactor }}</p>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- TEAM 1 -->
+  <section class="team-card">
+    <div class="team-header team1">
+      <div class="team-header-topline">
+        <h2 class="team-name">{{ data.teams.team1.name }}</h2>
+        <span class="team-streak-badge">Streak: {{ data.teams.team1.stats.WSTREAK }}</span>
+      </div>
+      <p class="team-meta">
+        GF: {{ data.teams.team1.stats.goals }} • GA: {{ data.teams.team1.stats.goalsAllowed }}
+      </p>
+    </div>
+
+    <div class="team-body">
+      <table class="stat-table">
+        <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><div class="stat-label">Goals</div></td><td class="stat-value">{{ data.teams.team1.stats.goals }}</td></tr>
+          <tr><td><div class="stat-label">Shots on Goal</div></td><td class="stat-value">{{ data.teams.team1.stats.SOG }}</td></tr>
+          <tr><td><div class="stat-label">Power Play %</div></td><td class="stat-value">{{ data.teams.team1.stats.PP }}</td></tr>
+          <tr><td><div class="stat-label">Shooting %</div></td><td class="stat-value">{{ data.teams.team1.stats.shooting }}</td></tr>
+          <tr><td><div class="stat-label">Faceoff %</div></td><td class="stat-value">{{ data.teams.team1.stats.faceoff }}</td></tr>
+          <tr><td><div class="stat-label">Goals Allowed</div></td><td class="stat-value">{{ data.teams.team1.stats.goalsAllowed }}</td></tr>
+          <tr><td><div class="stat-label">Shots Allowed</div></td><td class="stat-value">{{ data.teams.team1.stats.SOGAllowed }}</td></tr>
+          <tr><td><div class="stat-label">Penalty Kill %</div></td><td class="stat-value">{{ data.teams.team1.stats.PK }}</td></tr>
+          <tr><td><div class="stat-label">Penalty Minutes</div></td><td class="stat-value">{{ data.teams.team1.stats.PIM }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TEAM 2 -->
+  <section class="team-card">
+    <div class="team-header team2">
+      <div class="team-header-topline">
+        <h2 class="team-name">{{ data.teams.team2.name }}</h2>
+        <span class="team-streak-badge">Streak: {{ data.teams.team2.stats.WSTREAK }}</span>
+      </div>
+      <p class="team-meta">
+        GF: {{ data.teams.team2.stats.goals }} • GA: {{ data.teams.team2.stats.goalsAllowed }}
+      </p>
+    </div>
+
+    <div class="team-body">
+      <table class="stat-table">
+        <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><div class="stat-label">Goals</div></td><td class="stat-value">{{ data.teams.team2.stats.goals }}</td></tr>
+          <tr><td><div class="stat-label">Shots on Goal</div></td><td class="stat-value">{{ data.teams.team2.stats.SOG }}</td></tr>
+          <tr><td><div class="stat-label">Power Play %</div></td><td class="stat-value">{{ data.teams.team2.stats.PP }}</td></tr>
+          <tr><td><div class="stat-label">Shooting %</div></td><td class="stat-value">{{ data.teams.team2.stats.shooting }}</td></tr>
+          <tr><td><div class="stat-label">Faceoff %</div></td><td class="stat-value">{{ data.teams.team2.stats.faceoff }}</td></tr>
+          <tr><td><div class="stat-label">Goals Allowed</div></td><td class="stat-value">{{ data.teams.team2.stats.goalsAllowed }}</td></tr>
+          <tr><td><div class="stat-label">Shots Allowed</div></td><td class="stat-value">{{ data.teams.team2.stats.SOGAllowed }}</td></tr>
+          <tr><td><div class="stat-label">Penalty Kill %</div></td><td class="stat-value">{{ data.teams.team2.stats.PK }}</td></tr>
+          <tr><td><div class="stat-label">Penalty Minutes</div></td><td class="stat-value">{{ data.teams.team2.stats.PIM }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<form method = "GET" action = "/">
+	<button type="submit">Return Home</button>
+</form>
+
+</body>
+</html>
+

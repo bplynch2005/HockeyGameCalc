@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+        <title>Predictions</title>
+        <style>
+            .form-container {
+                display: flex;
+                gap: 10px; /* space between boxes */
+            }
+            input[type="text"] {
+                padding: 8px;
+                font-size: 14px;
+                width: 150px;
+            }
+        </style>
+</head>
+
+<body>
+    <form method = "POST" action = "/seasonStats">
+        <div class="form-container">
+            <input type="text" name="team1" placeholder="Team 1">
+            <input type="text" name="team2" placeholder="Team 2">
+            <button type="submit">View Season Stats</button>
+        </div>
+    </form>
+</body>
+</html>
