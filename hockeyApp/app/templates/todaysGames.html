@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tonight's Games & Predictions</title>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: #e2e8f0;
+        }
+
+        .games-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+        }
+
+        .matchup-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: baseline;
+            margin-bottom: 1rem;
+        }
+
+        .teams-line {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .prediction-pill {
+            font-size: 0.9rem;
+            background-color: #10b981;
+            color: #022c22;
+            font-weight: 600;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            min-width: max-content;
+        }
+
+        .section {
+            margin-top: 1rem;
+            border-top: 1px solid #334155;
+            padding-top: 1rem;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .teams-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .team-box {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+
+        .team-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f8fafc;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-line {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #475569;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Tonight's Games & Predictions</h1>
+
+<div class="games-container">
+
+    {# Loop over each matchup's data #}
+    {% for game in data %}
+    <div class="game-card">
+
+        <!-- Matchup + who wins -->
+        <div class="matchup-header">
+            <div class="teams-line">
+                {{ game.teams.team1.name }} @ {{ game.teams.team2.name }}
+            </div>
+
+            <div class="prediction-pill">
+                {{ game.prediction.betterTeam }} ({{ game.prediction.confidence }}%)
+            </div>
+        </div>
+
+        <!-- Why we picked them -->
+        <div class="section">
+            <div class="section-title">Why this pick</div>
+            <div class="details-grid">
+                <div>
+                    <div class="label">Projected Winner</div>
+                    <div class="value">{{ game.prediction.betterTeam }}</div>
+                </div>
+
+                <div>
+                    <div class="label">Confidence</div>
+                    <div class="value">{{ game.prediction.confidence }}%</div>
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <div class="label">Deciding Factor</div>
+                    <div class="value">{{ game.prediction.decidingFactor }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw stats for each team -->
+        <div class="section">
+            <div class="section-title">Team stats snapshot</div>
+
+            <div class="teams-stats">
+                <div class="team-box">
+                    <div class="team-name">{{ game.teams.team1.name }}</div>
+                    <div class="stat-line">
+                        {{ game.teams.team1.stats }}
+                    </div>
+                </div>
+
+                <div class="team-box">
+                    <div class="team-name">{{ game.teams.team2.name }}</div>
+                    <div class="stat-line">
+                        {{ game.teams.team2.stats }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+<div class="footer-note">
+    Generated by HockeyApp
+</div>
+
+</body>
+</html>
+
