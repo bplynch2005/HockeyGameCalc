@@ -54,7 +54,7 @@ coverage.xml
 *.seed
 *.swo
 *.swp
-
+*.txt
 # ======================================
 # Flask / Django / local settings
 # ======================================

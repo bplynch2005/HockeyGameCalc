@@ -38,8 +38,8 @@ def logData():
 scheduler = BackgroundScheduler()
 
 if not scheduler.running:
-    scheduler.add_job(getYesterdayGame, "interval", hour = 24)
-    scheduler.add_job(logData, "interval", hour = 24)
+    scheduler.add_job(getYesterdayGame, "interval", hours=24)
+    scheduler.add_job(logData, "interval", hours=24)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
