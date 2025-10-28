@@ -49,7 +49,7 @@ def calculate(team1Stats, team2Stats, team1_, team2_):
          betterTeam = "Evenly Matched!"
 
     sum = team1Score + team2Score
-    guarentee = max((team1Score/sum),(team2Score/sum))
+    guarentee = float('%.2f'%(max((team1Score/sum),(team2Score/sum)) * 100))
     
 
     if team1Score > team2Score:

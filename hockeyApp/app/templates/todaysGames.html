@@ -1,211 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tonight's Games & Predictions</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Today's Games</title>
 
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 2rem;
-        }
+  <style>
+    :root {
+      /* Page & neutrals */
+      --bg-page: #f3f4f8;
+      --bg-card: #ffffff;
+      --border-card: #d1d5df;
+      --text-main: #1a1a1f;
+      --text-dim: #51545f;
 
-        h1 {
-            text-align: center;
-            font-size: 1.75rem;
-            margin-bottom: 2rem;
-            color: #e2e8f0;
-        }
+      /* Accent block (prediction summary) */
+      --accent-bg: #eef3ff;
+      --accent-text: #1b255f;
+      --accent-border: #96a9ff;
 
-        .games-container {
-            max-width: 900px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
+      /* Team header colors */
+      --team1-header-bg: #0d3b66;
+      --team1-header-text: #ffffff;
+      --team2-header-bg: #7b1e2b;
+      --team2-header-text: #ffffff;
 
-        .game-card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
-        }
+      --table-header-bg: #f8f9fb;
+    }
 
-        .matchup-header {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            align-items: baseline;
-            margin-bottom: 1rem;
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        .teams-line {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #f8fafc;
-        }
+    body {
+      margin: 0;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      line-height: 1.45;
+      padding: 2rem 3rem;
+      overflow-y: scroll;
+    }
 
-        .prediction-pill {
-            font-size: 0.9rem;
-            background-color: #10b981;
-            color: #022c22;
-            font-weight: 600;
-            padding: 0.4rem 0.6rem;
-            border-radius: 8px;
-            min-width: max-content;
-        }
+    h1.page-title {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0 0 2rem 0;
+    }
 
-        .section {
-            margin-top: 1rem;
-            border-top: 1px solid #334155;
-            padding-top: 1rem;
-        }
+    /* Each game block */
+    .game-wrapper {
+      max-width: 1200px;
+      margin: 0 auto 2rem auto;
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      background-color: var(--bg-card);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+      padding: 1.5rem 1.5rem 2rem;
+    }
 
-        .section-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.05em;
-        }
+    .matchup-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
 
-        .teams-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
+    .matchup-header .teams-line {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      letter-spacing: -0.03rem;
+    }
 
-        .team-box {
-            background-color: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-        }
+    .matchup-header .subtext {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
 
-        .team-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #f8fafc;
-            margin-bottom: 0.5rem;
-        }
+    /* prediction summary for this game */
+    .prediction-card {
+      margin: 1.5rem auto 2rem auto;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      max-width: 600px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
 
-        .stat-line {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            line-height: 1.4;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
+    .prediction-card .pred-title {
+      color: var(--accent-text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04rem;
+      margin: 0 0 0.5rem;
+    }
 
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem 1rem;
-            font-size: 0.9rem;
-            color: #e2e8f0;
-        }
+    .prediction-card .pred-line {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: var(--accent-text);
+      font-weight: 500;
+      line-height: 1.4;
+    }
 
-        .label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
+    /* two-column stats layout for the teams */
+    .teams-flex {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: nowrap;
+    }
 
-        .value {
-            font-weight: 600;
-            color: #f8fafc;
-        }
+    .team-card {
+      width: 45%;
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      background-color: var(--bg-card);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
 
-        .footer-note {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #475569;
-            margin-top: 3rem;
-        }
-    </style>
+    .team-header {
+      padding: 0.9rem 1rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.02rem;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    .team-header.team1 {
+      background-color: var(--team1-header-bg);
+      color: var(--team1-header-text);
+    }
+
+    .team-header.team2 {
+      background-color: var(--team2-header-bg);
+      color: var(--team2-header-text);
+    }
+
+    .streak-line {
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .team-body {
+      padding: 1rem 1rem 1.25rem;
+    }
+
+    table.stat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    table.stat-table th {
+      background-color: var(--table-header-bg);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.5rem 0.5rem;
+      border-bottom: 1px solid var(--border-card);
+      color: var(--text-main);
+      font-size: 0.8rem;
+    }
+
+    table.stat-table td {
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid var(--border-card);
+      vertical-align: top;
+      color: var(--text-main);
+      font-size: 0.85rem;
+    }
+
+    table.stat-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .stat-label {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      line-height: 1.3;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      text-align: right;
+      color: var(--text-main);
+      white-space: nowrap;
+      font-size: 0.85rem;
+    }
+
+    /* scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-page);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-border);
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-text);
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Tonight's Games & Predictions</h1>
+  <h1 class="page-title">Today's Games</h1>
 
-<div class="games-container">
+  {# data is a list, each element is one game's finalData #}
+  {% for game in data %}
+  <section class="game-wrapper">
 
-    {# Loop over each matchup's data #}
-    {% for game in data %}
-    <div class="game-card">
-
-        <!-- Matchup + who wins -->
-        <div class="matchup-header">
-            <div class="teams-line">
-                {{ game.teams.team1.name }} @ {{ game.teams.team2.name }}
-            </div>
-
-            <div class="prediction-pill">
-                {{ game.prediction.betterTeam }} ({{ game.prediction.confidence }}%)
-            </div>
-        </div>
-
-        <!-- Why we picked them -->
-        <div class="section">
-            <div class="section-title">Why this pick</div>
-            <div class="details-grid">
-                <div>
-                    <div class="label">Projected Winner</div>
-                    <div class="value">{{ game.prediction.betterTeam }}</div>
-                </div>
-
-                <div>
-                    <div class="label">Confidence</div>
-                    <div class="value">{{ game.prediction.confidence }}%</div>
-                </div>
-
-                <div style="grid-column: span 2;">
-                    <div class="label">Deciding Factor</div>
-                    <div class="value">{{ game.prediction.decidingFactor }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Raw stats for each team -->
-        <div class="section">
-            <div class="section-title">Team stats snapshot</div>
-
-            <div class="teams-stats">
-                <div class="team-box">
-                    <div class="team-name">{{ game.teams.team1.name }}</div>
-                    <div class="stat-line">
-                        {{ game.teams.team1.stats }}
-                    </div>
-                </div>
-
-                <div class="team-box">
-                    <div class="team-name">{{ game.teams.team2.name }}</div>
-                    <div class="stat-line">
-                        {{ game.teams.team2.stats }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <div class="matchup-header">
+      <div class="teams-line">
+        {{ game.teams.team1.name }} vs {{ game.teams.team2.name }}
+      </div>
+      <div class="subtext">
+        Predicted winner: {{ game.prediction.betterTeam }}
+      </div>
     </div>
-    {% endfor %}
 
-</div>
+    <div class="prediction-card">
+      <p class="pred-title">Prediction</p>
 
-<div class="footer-note">
-    Generated by HockeyApp
-</div>
+      <p class="pred-line"><strong>Winner:</strong> {{ game.prediction.betterTeam }}</p>
+      <p class="pred-line"><strong>Confidence:</strong> {{ game.prediction.confidence }}</p>
+      <p class="pred-line"><strong>Key Factor:</strong> {{ game.prediction.decidingFactor }}</p>
+    </div>
+
+    <div class="teams-flex">
+
+      <!-- TEAM 1 CARD -->
+      <div class="team-card">
+        <div class="team-header team1">
+          <div>{{ game.teams.team1.name }}</div>
+          <div class="streak-line">
+            Streak:
+            {{ game.teams.team1.stats.WSTREAK }}
+          </div>
+        </div>
+
+        <div class="team-body">
+          <table class="stat-table">
+            <tbody>
+              <tr>
+                <td class="stat-label">Goals For</td>
+                <td class="stat-value">{{ game.teams.team1.stats.goals }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Goals Allowed</td>
+                <td class="stat-value">{{ game.teams.team1.stats.goalsAllowed }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shots on Goal</td>
+                <td class="stat-value">{{ game.teams.team1.stats.SOG }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shots Allowed</td>
+                <td class="stat-value">{{ game.teams.team1.stats.SOGAllowed }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Power Play %</td>
+                <td class="stat-value">{{ game.teams.team1.stats.PP }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Penalty Kill %</td>
+                <td class="stat-value">{{ game.teams.team1.stats.PK }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shooting %</td>
+                <td class="stat-value">{{ game.teams.team1.stats.shooting }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Faceoff %</td>
+                <td class="stat-value">{{ game.teams.team1.stats.faceoff }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Penalty Minutes</td>
+                <td class="stat-value">{{ game.teams.team1.stats.PIM }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TEAM 2 CARD -->
+      <div class="team-card">
+        <div class="team-header team2">
+          <div>{{ game.teams.team2.name }}</div>
+          <div class="streak-line">
+            Streak:
+            {{ game.teams.team2.stats.WSTREAK }}
+          </div>
+        </div>
+
+        <div class="team-body">
+          <table class="stat-table">
+            <tbody>
+              <tr>
+                <td class="stat-label">Goals For</td>
+                <td class="stat-value">{{ game.teams.team2.stats.goals }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Goals Allowed</td>
+                <td class="stat-value">{{ game.teams.team2.stats.goalsAllowed }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shots on Goal</td>
+                <td class="stat-value">{{ game.teams.team2.stats.SOG }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shots Allowed</td>
+                <td class="stat-value">{{ game.teams.team2.stats.SOGAllowed }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Power Play %</td>
+                <td class="stat-value">{{ game.teams.team2.stats.PP }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Penalty Kill %</td>
+                <td class="stat-value">{{ game.teams.team2.stats.PK }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Shooting %</td>
+                <td class="stat-value">{{ game.teams.team2.stats.shooting }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Faceoff %</td>
+                <td class="stat-value">{{ game.teams.team2.stats.faceoff }}</td>
+              </tr>
+              <tr>
+                <td class="stat-label">Penalty Minutes</td>
+                <td class="stat-value">{{ game.teams.team2.stats.PIM }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div> <!-- /.teams-flex -->
+
+  </section>
+  {% endfor %}
+  
+  <form method = "GET" action = "/">
+	  <button type="submit">Return Home</button>
+  </form>
 
 </body>
 </html>
