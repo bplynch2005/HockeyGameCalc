@@ -101,5 +101,4 @@ def parse(team1_, team2_):
          team2Stats['WSTREAK'] = str(match.group(1))
 
     teamStats = [team1Stats, team2Stats, team1_, team2_]
-    return teamStats
-
+    return teamStats 
