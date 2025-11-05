@@ -70,3 +70,25 @@ def calculate(team1Stats, team2Stats, team1_, team2_):
     finalized = [betterTeam, guarentee, decidingFactor]
     return finalized
 
+def parlayMaker(winnerList):
+    #winnerList is a list of predictions, prediction[1] = our confidence
+    parlay = [] #parlay will contain all games 85% confidence and up, and will inclue games with 75% confidence to fill parlay length to 5.
+    lowConfidence = True
+
+    for prediction in winnerList:
+        if(prediction[1] > 75):
+            parlay.append(prediction)
+    
+    while(len(parlay) > 5 and lowConfidence):
+        worstLeg = parlay[0]
+        
+        for prediction in parlay:
+            if(prediction[1] < 85) and (prediction[1] < worstLeg[0]):
+                worstLeg = prediction
+        
+        if worstLeg[1] >= 85:
+            lowConfidence = False
+        else:
+            parlay.remove(worstLeg)
+
+    return parlay

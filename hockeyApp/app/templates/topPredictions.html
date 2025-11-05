@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Top Predictions</title>
+  <style>
+    :root {
+      /* Page + neutrals */
+      --bg-page: #f3f4f8;
+      --bg-card: #ffffff;
+      --border-card: #d1d5df;
+      --text-main: #1a1a1f;
+      --text-dim: #51545f;
+
+      /* Accents */
+      --accent-bg: #eef3ff;
+      --accent-border: #96a9ff;
+      --accent-text: #1b255f;
+
+      /* Emphasis */
+      --good: #0f9d58;    /* green */
+      --warn: #f4b400;    /* yellow */
+      --bad:  #db4437;    /* red */
+
+      --table-header-bg: #f8f9fb;
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+      line-height: 1.45;
+      padding: 2rem 3rem;
+      overflow-y: scroll;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 1rem 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 1.25rem 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+
+    .sub {
+      color: var(--text-dim);
+      font-size: .95rem;
+      margin-top: .25rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 800px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .kpi {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .75rem 1rem; border: 1px dashed var(--border-card); border-radius: 10px;
+      background: #fafbfe;
+    }
+    .kpi h3 { margin: 0; font-size: .95rem; color: var(--text-dim); }
+    .kpi .val { font-weight: 700; font-size: 1.1rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--border-card);
+      background: var(--bg-card);
+    }
+
+    thead th {
+      text-align: left;
+      font-weight: 600;
+      font-size: .9rem;
+      color: var(--text-dim);
+      background: var(--table-header-bg);
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--border-card);
+    }
+
+    tbody td {
+      padding: .9rem 1rem;
+      border-bottom: 1px solid #eceef4;
+      vertical-align: middle;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: .25rem .55rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      border: 1px solid transparent;
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+      white-space: nowrap;
+    }
+
+    .chip.good { background: #eaf7f0; border-color: #b9e3ca; color: #0b6e3d; }
+    .chip.warn { background: #fff7e6; border-color: #ffe2a8; color: #835a05; }
+    .chip.bad  { background: #fdeeee; border-color: #f6c3c3; color: #8e1c15; }
+
+    .bar {
+      height: 8px;
+      width: 100%;
+      background: #eef1f6;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--good);
+      transition: width .4s ease;
+    }
+
+    .muted { color: var(--text-dim); font-size: .9rem; }
+
+    .empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-dim);
+    }
+
+    .footer-note {
+      margin-top: 1rem;
+      font-size: .85rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="page-title">Top Predictions</h1>
+
+    <!-- Summary / KPIs -->
+    <div class="card" style="margin-bottom: 1rem;">
+      <div class="grid grid-2">
+        <div class="kpi">
+          <h3>Total legs</h3>
+          <div class="val">
+            {{ data|length }}
+          </div>
+        </div>
+        <div class="kpi">
+          <h3>Average confidence</h3>
+          <div class="val">
+            {# compute average safely #}
+            {% set avg = (data|length and (data | sum(attribute=1) / (data|length))) or 0 %}
+            {{ '%.2f' % avg }}%
+          </div>
+        </div>
+      </div>
+      <div class="sub">Showing up to 5 strongest legs after pruning.</div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      {% if not data or data|length == 0 %}
+        <div class="empty">
+          No qualifying games at the moment. Check back later.
+        </div>
+      {% else %}
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 32%">Pick</th>
+            <th style="width: 18%">Confidence</th>
+            <th>Deciding factor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in data %}
+            {# p[0]=team (str), p[1]=confidence (float), p[2]=reason (str) #}
+            {% set team = p[0] %}
+            {% set conf = p[1] %}
+            {% set reason = p[2] %}
+            {% set pct = ('%.2f' % conf) %}
+            {% set band = 'good' if conf >= 85 else ('warn' if conf >= 75 else 'bad') %}
+            <tr>
+              <td>
+                <div style="font-weight:600">{{ team }}</div>
+                <div class="muted">Pick to win</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;">
+                  <span class="chip {{ band }}">{{ pct }}%</span>
+                </div>
+                <div class="bar" aria-hidden="true" title="{{ pct }}%">
+                  <span style="width: {{ ([0, conf, 100] | sort)[1] }}%;"></span>
+                </div>
+              </td>
+              <td>
+                {{ reason }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      <div class="footer-note">
+        Confidence buckets: <span class="chip good">≥ 85%</span>
+        <span class="chip warn">75–84.99%</span>
+        <span class="chip bad">&lt; 75%</span>
+      </div>
+    </div>
+  </div>
+  <form method = "GET" action = "/">
+	  <button type="submit">Home</button>
+  </form>
+</body>
+</html>
+
