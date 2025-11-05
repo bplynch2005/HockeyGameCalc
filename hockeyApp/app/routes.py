@@ -20,6 +20,7 @@ def getYesterdayGame():
             count += 1
 
     total = "I correctly predicted " + str(count) + " games out of " + str(len(predictions)) + " yesterday..."
+    print(total)
 
 def logData():
     schedule = todaysGames()
@@ -38,7 +39,7 @@ def logData():
 scheduler = BackgroundScheduler()
 
 if not scheduler.running:
-    scheduler.add_job(getYesterdayGame, "interval", hours=24)
+    scheduler.add_job(getYesterdayGame, "interval", seconds=15)
     scheduler.add_job(logData, "interval", hours=24)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
@@ -69,7 +70,7 @@ def predict():
     schedule = todaysGames()
     statsList = []
     for matchup in schedule:
-        teamStats = parse(matchup[0], matchup[1])
+        teamStats = parse(matchup[0], matchup[1]) #teamStats[0] = team1Stats, teamStats[1] = team2Stats, teamStats[2] = team1_name, teamStats[3] = team2_name
         statsList.append(teamStats)
     
     winnerList = []
