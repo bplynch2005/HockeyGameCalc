@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 
 from pyProgs.statParser.parse import parse
-from pyProgs.statCalculator.calculate import calculate
+from pyProgs.statCalculator.calculate import calculate, parlayMaker
 from pyProgs.getGames.todaysGames import todaysGames, yesterdaysWinners
 from pyProgs.gameLogger.logger import log, getYesterday
 
@@ -75,11 +75,29 @@ def predict():
     
     winnerList = []
     for stats in statsList:
-        prediction = calculate(stats[0], stats[1], stats[2], stats[3])
+        prediction = calculate(stats[0], stats[1], stats[2], stats[3]) #prediction[0] = better team, prediction[1] = confidence, prediction[2] = deciding factor
         finalData = {"teams": {"team1": {"name": stats[2], "stats": stats[0]}, "team2": {"name": stats[3], "stats": stats[1]}}, "prediction":{"betterTeam": prediction[0], "confidence": prediction[1], "decidingFactor": prediction[2]}}
         winnerList.append(finalData)
 
     resp = make_response(render_template("todaysGames.html", data=winnerList))
+    return resp
+
+@app.route('/topPredictions', methods=['GET', 'POST'])
+def getBest():
+    schedule = todaysGames()
+    statsList = []
+    for matchup in schedule:
+        teamStats = parse(matchup[0], matchup[1]) #teamStats[0] = team1Stats, teamStats[1] = team2Stats, teamStats[2] = team1_name, teamStats[3] = team2_name
+        statsList.append(teamStats)
+
+    winnerList = []
+    for stats in statsList:
+        prediction = calculate(stats[0], stats[1], stats[2], stats[3]) #prediction[0] = better team, prediction[1] = confidence, prediction[2] = deciding factors
+        winnerList.append(prediction)
+
+    peakParlay = parlayMaker(winnerList) #includes up to 5 predictions. can be empty list
+    
+    resp = make_response(render_template("topPredictions.html", data=peakParlay))
     return resp
 
 @app.route('/index')
